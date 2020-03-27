@@ -1,29 +1,21 @@
-# OS X
-.DS_Store*
-Icon?
-._*
+# API keys and secrets
+.env
 
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Linux
-.directory
-*~
-
-
-# npm
+# Dependency directory
 node_modules
+bower_components
+
+# Editors
+.idea
+*.iml
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Ignore built ts files
+dist/**/*
+
+# Logging files
 *.log
-*.gz
-
-
-# Coveralls
-coverage
-
-# Benchmarking
-benchmarks/graphs
-
-# Project specific
-env
+*.pyc
