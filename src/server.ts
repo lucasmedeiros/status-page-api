@@ -9,16 +9,9 @@ import config from './config'
 import { logger } from './logging'
 
 const app = new Koa()
-// Provides important security headers to make your app more secure
 app.use(helmet())
-
-// Enable cors with default options
 app.use(cors())
-
-// Logger middleware -> use winston as logger (logging.ts with config)
 app.use(logger(winston))
-
-// Enable bodyParser with default options
 app.use(bodyParser())
 
 app.use(json())
