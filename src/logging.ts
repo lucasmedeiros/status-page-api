@@ -7,11 +7,7 @@ export function logger(winstonInstance) {
   winstonInstance.configure({
     level: config.debugLogging ? 'debug' : 'info',
     transports: [
-      //
-      // - Write all logs error (and below) to `error.log`.
       new winston.transports.File({ filename: 'error.log', level: 'error' }),
-      //
-      // - Write to all logs with specified level to console.
       new winston.transports.Console({
         format: winston.format.combine(
           winston.format.colorize(),
