@@ -4,8 +4,8 @@ import connection from '@database/connection'
 class Component extends Model<ComponentAttrs> {
   public id!: number
   public name!: string
-  public readonly created_at!: Date
-  public readonly updated_at!: Date
+  public readonly createdAt!: Date
+  public readonly updatedAt!: Date
 }
 
 Component.init(

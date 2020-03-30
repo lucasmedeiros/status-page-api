@@ -6,21 +6,18 @@ import bodyParser from 'koa-bodyparser'
 import helmet from 'koa-helmet'
 import winston from 'winston'
 import cors from '@koa/cors'
-import component from '@models/component'
+import routes from '@routes/index'
 
 import config from './config'
 import { logger } from './logging'
-
-// eslint-disable-next-line no-console
-console.log(component)
 
 const app = new Koa()
 app.use(helmet())
 app.use(cors())
 app.use(logger(winston))
 app.use(bodyParser())
-
 app.use(json())
+app.use(routes.routes()).use(routes.allowedMethods())
 
 app.listen(config.port, () => {
   // eslint-disable-next-line no-console
