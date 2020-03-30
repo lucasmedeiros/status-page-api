@@ -1,8 +1,6 @@
-import { Sequelize } from 'sequelize-typescript'
-import config from '@src/config'
-import Component from '@models/component'
+import { Sequelize } from 'sequelize'
 
-const models = [Component]
+import config from '../config'
 
 const sequelize = new Sequelize({
   database: config.databaseName,
@@ -15,7 +13,6 @@ const sequelize = new Sequelize({
     multipleStatements: true,
   },
   logging: false,
-  models,
 })
 
 export default sequelize

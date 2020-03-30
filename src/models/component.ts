@@ -1,25 +1,30 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript'
+import { Model, DataTypes } from 'sequelize'
+import connection from '@database/connection'
 
-@Table({
-  defaultScope: {
-    attributes: { exclude: ['deleted_at'] },
-    paranoid: true,
-  },
-})
 class Component extends Model<ComponentAttrs> {
-  @Column({
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    type: DataType.INTEGER.UNSIGNED,
-  })
   public id!: number
-
-  @Column({
-    allowNull: false,
-    type: DataType.STRING,
-  })
-  public name: string
+  public name!: string
+  public readonly created_at!: Date
+  public readonly updated_at!: Date
 }
+
+Component.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+      allowNull: false,
+    },
+    name: {
+      type: new DataTypes.STRING(128),
+      allowNull: false,
+    },
+  },
+  {
+    sequelize: connection,
+    tableName: 'Components',
+  }
+)
 
 export default Component
