@@ -3,7 +3,7 @@ import winston from 'winston'
 
 import config from './config'
 
-export function logger(winstonInstance) {
+export function logger(winstonInstance: typeof winston) {
   winstonInstance.configure({
     level: config.debugLogging ? 'debug' : 'info',
     transports: [
@@ -25,7 +25,7 @@ export function logger(winstonInstance) {
 
     const ms = new Date().getTime() - start
 
-    let logLevel: string
+    let logLevel = 'info'
     if (ctx.status >= 500) {
       logLevel = 'error'
     } else if (ctx.status >= 400) {
