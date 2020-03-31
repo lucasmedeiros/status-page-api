@@ -101,6 +101,7 @@
     "@database": "dist/database",
     "@routes": "dist/routes",
     "@services": "dist/services",
-    "@controllers": "dist/controllers"
+    "@controllers": "dist/controllers",
+    "@utils": "dist/utils"
   }
 }
