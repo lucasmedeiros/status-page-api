@@ -19,11 +19,16 @@ export default {
     ctx.body = evaluateResult(result)
   },
 
+  create: async (ctx: Context) => {
+    const result = await service.create(ctx.request.body)
+    ctx.status = result.status
+    ctx.body = evaluateResult(result)
+  },
+
   update: async (ctx: Context) => {
     const { id } = ctx.params
-    const { name } = ctx.request.body
 
-    const result = await service.update(id, { name })
+    const result = await service.update(id, ctx.request.body)
 
     ctx.status = result.status
     ctx.body = evaluateResult(result)

@@ -1,6 +1,6 @@
 import Component from '@models/component'
 import { dbErr, dbOk } from '@utils/dbResult'
-import { NOT_FOUND, OK, BAD_REQUEST } from 'http-status-codes'
+import { NOT_FOUND, OK, BAD_REQUEST, CREATED } from 'http-status-codes'
 
 export default {
   get: async (): Promise<Component[]> => {
@@ -14,6 +14,17 @@ export default {
     if (!component) return dbErr(new Error('Component not found'), NOT_FOUND)
 
     return dbOk(component, OK)
+  },
+
+  create: async (
+    body: ComponentBody
+  ): Promise<DatabaseResult<Component, Error>> => {
+    if (!body.name)
+      return dbErr(new Error(`'Name' field must not be null`), BAD_REQUEST)
+
+    const component = await Component.create(body)
+
+    return dbOk(component, CREATED)
   },
 
   update: async (
