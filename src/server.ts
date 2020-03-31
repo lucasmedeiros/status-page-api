@@ -20,6 +20,6 @@ app.use(json())
 app.use(routes.routes()).use(routes.allowedMethods())
 
 app.listen(config.port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server running on port ${config.port}`)
+  winston.log('info', `Server running on port ${config.port}`)
+  winston.log('info', `To stop, press CTRL + C`)
 })

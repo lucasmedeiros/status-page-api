@@ -6,3 +6,23 @@ interface ComponentAttrs {
   readonly createdAt: Date
   readonly updatedAt: Date
 }
+
+interface ComponentBody {
+  name?: string
+}
+
+interface ErrorResponse {
+  message: string
+}
+
+type DatabaseResult<R, E> =
+  | {
+      isError: true
+      status: number
+      error: E
+    }
+  | {
+      isError: false
+      status: number
+      value: R
+    }

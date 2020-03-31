@@ -14,7 +14,6 @@ Component.init(
       type: DataTypes.INTEGER.UNSIGNED,
       autoIncrement: true,
       primaryKey: true,
-      allowNull: false,
     },
     name: {
       type: new DataTypes.STRING(128),
