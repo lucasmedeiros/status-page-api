@@ -33,4 +33,13 @@ export default {
     ctx.status = result.status
     ctx.body = evaluateResult(result)
   },
+
+  del: async (ctx: Context) => {
+    const { id } = ctx.params
+
+    const result = await service.del(id)
+
+    ctx.status = result.status
+    ctx.body = evaluateResult(result)
+  },
 }

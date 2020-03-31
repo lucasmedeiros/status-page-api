@@ -42,4 +42,12 @@ export default {
 
     return dbOk(component, OK)
   },
+
+  del: async (id: number): Promise<DatabaseResult<Component, Error>> => {
+    const component = await Component.findByPk(id)
+    if (!component) return dbErr(new Error('Component not found'), NOT_FOUND)
+
+    await component.destroy()
+    return dbOk(component, OK)
+  },
 }
