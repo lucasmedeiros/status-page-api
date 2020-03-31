@@ -14,12 +14,29 @@ interface IncidentAttrs {
   readonly updatedAt: Date
 }
 
+interface OccurrenceAttrs {
+  id: number
+  active: boolean
+  description: string
+  componentId: number
+  incidentId: number
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
 interface ComponentBody {
   name?: string
 }
 
 interface IncidentBody {
   name?: string
+}
+
+interface OccurrenceBody {
+  active?: boolean
+  description?: string
+  componentId?: number
+  incidentId?: number
 }
 
 interface ErrorResponse {
