@@ -9,3 +9,9 @@ export const dbErr = <T, E>(err: E, status: number): DatabaseResult<T, E> => ({
   error: err,
   status,
 })
+
+export const evaluateResult = <T>(
+  result: DatabaseResult<T, Error>
+): T | ErrorResponse => {
+  return result.isError ? { message: result.error.message } : result.value
+}
