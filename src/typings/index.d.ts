@@ -7,7 +7,18 @@ interface ComponentAttrs {
   readonly updatedAt: Date
 }
 
+interface IncidentAttrs {
+  id: number
+  name: string
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
 interface ComponentBody {
+  name?: string
+}
+
+interface IncidentBody {
   name?: string
 }
 
