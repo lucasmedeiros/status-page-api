@@ -68,7 +68,7 @@ class OccurenceController
       const occurrence = await Occurrence.create(body)
       return dbOk(occurrence, CREATED)
     } catch (error) {
-      return dbErr(new Error(error.message), INTERNAL_SERVER_ERROR)
+      return dbErr(error, INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -87,7 +87,7 @@ class OccurenceController
       await occurence.update(body)
       return dbOk(occurence, OK)
     } catch (error) {
-      return dbErr(new Error(error.message), INTERNAL_SERVER_ERROR)
+      return dbErr(error, INTERNAL_SERVER_ERROR)
     }
   }
 

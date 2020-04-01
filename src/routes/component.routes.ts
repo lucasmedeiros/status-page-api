@@ -2,7 +2,7 @@ import Router from 'koa-router'
 import ComponentController from '@controllers/component'
 import Handler from '@utils/handler'
 
-const handler = new Handler(new ComponentController())
+const handler = new Handler<ComponentBody>(new ComponentController())
 
 const routes = new Router()
 routes.get('Get all components', '/', handler.get)

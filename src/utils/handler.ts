@@ -28,7 +28,7 @@ class Handler<B> {
   }
 
   public get = async (ctx: Context) => {
-    const result = await this.controller.get()
+    const result = await this.controller.get(ctx)
     ctx.status = OK
     ctx.body = result
   }
