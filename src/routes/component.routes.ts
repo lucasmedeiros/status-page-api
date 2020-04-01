@@ -1,10 +1,13 @@
 import Router from 'koa-router'
-import controller from '@controllers/component'
+import ComponentController from '@controllers/component'
+import Handler from '@utils/handler'
+
+const handler = new Handler(new ComponentController())
 
 const routes = new Router()
-routes.get('Get all components', '/', controller.get)
-routes.get('Get component', '/:id', controller.getOne)
-routes.post('Create component', '/', controller.create)
-routes.put('Update component', '/:id', controller.update)
-routes.del('Delete component', '/:id', controller.del)
+routes.get('Get all components', '/', handler.get)
+routes.get('Get component', '/:id', handler.getOne)
+routes.post('Create component', '/', handler.create)
+routes.put('Update component', '/:id', handler.update)
+routes.del('Delete component', '/:id', handler.del)
 export default routes

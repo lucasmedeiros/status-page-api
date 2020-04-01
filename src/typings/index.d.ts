@@ -54,3 +54,11 @@ type DatabaseResult<R, E> =
       status: number
       value: R
     }
+
+interface Controller<M, B, E> {
+  get(): Promise<M[]>
+  getOne(id: number): Promise<DatabaseResult<M, E>>
+  create(body: B): Promise<DatabaseResult<M, E>>
+  update(id: number, body: B): Promise<DatabaseResult<M, E>>
+  del(id: number): Promise<DatabaseResult<M, E>>
+}

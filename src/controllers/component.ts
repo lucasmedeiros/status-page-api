@@ -1,45 +1,60 @@
-import { OK } from 'http-status-codes'
-import service from '@services/component.service'
-import { evaluateResult } from '@utils/dbResult'
-import { Context } from 'koa'
+import Component from '@models/component'
+import { dbErr, dbOk } from '@utils/handler'
+import { NOT_FOUND, OK, BAD_REQUEST, CREATED } from 'http-status-codes'
 
-export default {
-  get: async (ctx: Context) => {
-    const component = await service.get()
-    ctx.status = OK
-    ctx.body = component
-  },
+class ComponentController
+  implements Controller<Component, ComponentBody, Error> {
+  public get = async (): Promise<Component[]> => {
+    const components = await Component.findAll()
+    return components
+  }
 
-  getOne: async (ctx: Context) => {
-    const { id } = ctx.params
+  public getOne = async (
+    id: number
+  ): Promise<DatabaseResult<Component, Error>> => {
+    const component = await Component.findByPk(id)
 
-    const result = await service.getOne(id)
+    if (!component) return dbErr(new Error('Component not found'), NOT_FOUND)
 
-    ctx.status = result.status
-    ctx.body = evaluateResult(result)
-  },
+    return dbOk(component, OK)
+  }
 
-  create: async (ctx: Context) => {
-    const result = await service.create(ctx.request.body)
-    ctx.status = result.status
-    ctx.body = evaluateResult(result)
-  },
+  public create = async (
+    body: ComponentBody
+  ): Promise<DatabaseResult<Component, Error>> => {
+    if (!body.name)
+      return dbErr(new Error(`'Name' field must not be null`), BAD_REQUEST)
 
-  update: async (ctx: Context) => {
-    const { id } = ctx.params
+    const component = await Component.create(body)
 
-    const result = await service.update(id, ctx.request.body)
+    return dbOk(component, CREATED)
+  }
 
-    ctx.status = result.status
-    ctx.body = evaluateResult(result)
-  },
+  public update = async (
+    id: number,
+    body: ComponentBody
+  ): Promise<DatabaseResult<Component, Error>> => {
+    const component = await Component.findByPk(id)
 
-  del: async (ctx: Context) => {
-    const { id } = ctx.params
+    if (!component) return dbErr(new Error('Component not found'), NOT_FOUND)
 
-    const result = await service.del(id)
+    if (body.name === null)
+      return dbErr(new Error(`'Name' field must not be null`), BAD_REQUEST)
 
-    ctx.status = result.status
-    ctx.body = evaluateResult(result)
-  },
+    await component.update(body)
+
+    return dbOk(component, OK)
+  }
+
+  public del = async (
+    id: number
+  ): Promise<DatabaseResult<Component, Error>> => {
+    const component = await Component.findByPk(id)
+    if (!component) return dbErr(new Error('Component not found'), NOT_FOUND)
+
+    await component.destroy()
+    return dbOk(component, OK)
+  }
 }
+
+export default ComponentController
