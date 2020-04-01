@@ -14,12 +14,29 @@ interface IncidentAttrs {
   readonly updatedAt: Date
 }
 
+interface OccurrenceAttrs {
+  id: number
+  active: boolean
+  description: string
+  componentId: number
+  incidentId: number
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
 interface ComponentBody {
   name?: string
 }
 
 interface IncidentBody {
   name?: string
+}
+
+interface OccurrenceBody {
+  active?: boolean
+  description?: string
+  componentId?: number
+  incidentId?: number
 }
 
 interface ErrorResponse {
@@ -37,3 +54,11 @@ type DatabaseResult<R, E> =
       status: number
       value: R
     }
+
+interface Controller<M, B, E> {
+  get(): Promise<M[]>
+  getOne(id: number): Promise<DatabaseResult<M, E>>
+  create(body: B): Promise<DatabaseResult<M, E>>
+  update(id: number, body: B): Promise<DatabaseResult<M, E>>
+  del(id: number): Promise<DatabaseResult<M, E>>
+}

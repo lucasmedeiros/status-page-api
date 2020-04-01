@@ -1,10 +1,13 @@
 import Router from 'koa-router'
-import controller from '@controllers/incident'
+import IncidentController from '@controllers/incident'
+import Handler from '@utils/handler'
+
+const handler = new Handler(new IncidentController())
 
 const routes = new Router()
-routes.get('Get all incidents', '/', controller.get)
-routes.get('Get incident', '/:id', controller.getOne)
-routes.post('Create incident', '/', controller.create)
-routes.put('Update incident', '/:id', controller.update)
-routes.del('Delete incident', '/:id', controller.del)
+routes.get('Get all incidents', '/', handler.get)
+routes.get('Get incident', '/:id', handler.getOne)
+routes.post('Create incident', '/', handler.create)
+routes.put('Update incident', '/:id', handler.update)
+routes.del('Delete incident', '/:id', handler.del)
 export default routes
