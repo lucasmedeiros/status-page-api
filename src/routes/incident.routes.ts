@@ -2,7 +2,7 @@ import Router from 'koa-router'
 import IncidentController from '@controllers/incident'
 import Handler from '@utils/handler'
 
-const handler = new Handler(new IncidentController())
+const handler = new Handler<IncidentBody>(new IncidentController())
 
 const routes = new Router()
 routes.get('Get all incidents', '/', handler.get)

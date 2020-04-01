@@ -24,6 +24,14 @@ interface OccurrenceAttrs {
   readonly updatedAt: Date
 }
 
+interface OccurrenceStepAttrs {
+  id: number
+  description: string
+  occurrenceId: number
+  readonly createdAt: Date
+  readonly updatedAt: Date
+}
+
 interface ComponentBody {
   name?: string
 }
@@ -37,6 +45,15 @@ interface OccurrenceBody {
   description?: string
   componentId?: number
   incidentId?: number
+}
+
+interface OccurrenceStepBody {
+  description?: string
+  occurrenceId?: number
+}
+
+interface OccurrenceStepOptions {
+  occurrenceId: number
 }
 
 interface ErrorResponse {
@@ -56,7 +73,7 @@ type DatabaseResult<R, E> =
     }
 
 interface Controller<M, B, E> {
-  get(): Promise<M[]>
+  get(ctx?: any): Promise<M[]>
   getOne(id: number): Promise<DatabaseResult<M, E>>
   create(body: B): Promise<DatabaseResult<M, E>>
   update(id: number, body: B): Promise<DatabaseResult<M, E>>
