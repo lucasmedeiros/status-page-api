@@ -19,6 +19,7 @@ routes.post('Create occurrence', '/', occurrenceHandler.create)
 routes.put('Update occurrence', '/:id', occurrenceHandler.update)
 routes.del('Delete occurrence', '/:id', occurrenceHandler.del)
 
+// Occurrences Steps
 routes.get('Get all steps for one occurrence', '/:id/steps', stepHandler.get)
 routes.get('Get one occurrence step', '/step/:id', stepHandler.getOne)
 routes.post('Create occurrence step', '/step', stepHandler.create)

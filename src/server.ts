@@ -1,4 +1,4 @@
-// import 'module-alias/register'
+import 'module-alias/register'
 
 import Koa from 'koa'
 import json from 'koa-json'

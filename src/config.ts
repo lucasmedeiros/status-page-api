@@ -13,6 +13,12 @@ const config = {
   databasePassword: isDevMode ? '123456' : process.env.DATABASE_PASSWORD,
   databaseName: 'statuspage',
   databaseHost: isDevMode ? 'localhost' : process.env.DATABASE_HOST,
+  slack: {
+    botUserToken: process.env.BOT_USER_TOKEN,
+    signinSecret: process.env.SLACK_APP_SIGNIN_SECRET,
+    clientId: process.env.SLACK_APP_CLIENT_ID,
+    verificationToken: process.env.SLACK_APP_VERIFICATION_TOKEN,
+  },
 }
 
 export default config
