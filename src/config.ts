@@ -9,10 +9,17 @@ const config = {
   port: process.env.PORT ? +process.env.PORT : DEFAULT_SERVER_PORT,
   debugLogging: isDevMode,
   devMode: isDevMode,
-  databaseUser: isDevMode ? 'postgres' : process.env.DATABASE_USER,
-  databasePassword: isDevMode ? '123456' : process.env.DATABASE_PASSWORD,
-  databaseName: 'statuspage',
-  databaseHost: isDevMode ? 'localhost' : process.env.DATABASE_HOST,
+  database: {
+    user: isDevMode ? 'postgres' : process.env.DATABASE_USER,
+    password: isDevMode ? '123456' : process.env.DATABASE_PASSWORD,
+    name: isDevMode ? 'statuspage' : process.env.DATABASE_NAME,
+    host: isDevMode ? 'localhost' : process.env.DATABASE_HOST,
+    port: isDevMode
+      ? 5432
+      : process.env.DATABASE_PORT
+      ? +process.env.DATABASE_PORT
+      : 5432,
+  },
   slack: {
     botUserToken: process.env.BOT_USER_TOKEN,
     signinSecret: process.env.SLACK_APP_SIGNIN_SECRET,

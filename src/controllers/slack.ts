@@ -7,43 +7,42 @@ export default {
   botEvent: (ctx: Context) => {
     const { challenge } = ctx.request.body
 
-    // http://localhost:8000/slack
-
     if (!challenge) {
-      ctx.status = BAD_REQUEST
-      ctx.body = { error: 'Challenge not provided' }
-    } else {
-      ctx.status = OK
-      ctx.body = { challenge }
+      if (ctx.request.body.event) {
+        const {
+          type,
+          text,
+          channel,
+        }: {
+          type: string
+          text: string
+          channel: string
+        } = ctx.request.body.event
 
-      const {
-        type,
-        text,
-        channel,
-      }: {
-        type: string
-        text: string
-        channel: string
-      } = ctx.request.body.event
+        if (type === 'message') {
+          let responseText: string | undefined
 
-      if (type === 'message') {
-        let responseText: string | undefined
+          if (text.includes(`start`)) {
+            responseText = 'Você começou!'
+          }
 
-        if (text.includes(`start`)) {
-          responseText = 'Você começou!'
-        }
-
-        if (responseText) {
-          try {
-            slackService.sendMessage(responseText, channel)
-          } catch (error) {
-            winston.log(
-              'error',
-              `Não foi possível enviar a mensagem para o canal. Erro: ${error.message}`
-            )
+          if (responseText) {
+            try {
+              slackService.sendMessage(responseText, channel)
+            } catch (error) {
+              winston.log(
+                'error',
+                `Não foi possível enviar a mensagem para o canal. Erro: ${error.message}`
+              )
+            }
           }
         }
       }
+
+      ctx.status = OK
+    } else {
+      ctx.status = OK
+      ctx.body = { challenge }
     }
   },
 }
