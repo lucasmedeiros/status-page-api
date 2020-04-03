@@ -63,7 +63,7 @@ export default {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `${component.name} is under ${incident.name}!`,
+            text: `*${component.name}* is under *${incident.name}*!`,
           },
         },
       ],
@@ -91,7 +91,44 @@ export default {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `${component.name} is no longer under ${incident.name}!`,
+            text: `*${component.name}* is no longer under *${incident.name}*!`,
+          },
+        },
+      ],
+    })
+  },
+
+  notifyUpdateOccurrence: async ({
+    component,
+    incident,
+    step,
+  }: {
+    component: ComponentBody
+    incident: IncidentBody
+    step: OccurrenceStepBody
+  }) => {
+    callWebhook({
+      text: 'OCCURRENCE UPDATED :construction_worker:',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'OCCURRENCE UPDATED :construction_worker:',
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `*${incident.name}* on *${component.name}* had an update!`,
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `${step.description}`,
           },
         },
       ],

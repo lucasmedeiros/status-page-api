@@ -9,6 +9,7 @@ import { Context } from 'koa'
 import OccurrenceStep from '@models/occurrenceStep'
 import { dbErr, dbOk } from '@utils/handler'
 import Occurrence from '@models/occurrence'
+import slackService from '@services/slack.service'
 
 import OccurenceController from './occurrence'
 
@@ -64,6 +65,18 @@ class OccurrenceStepController
         description: body.description,
         occurrenceId: body.occurrenceId,
       })
+
+      if (occurrence.value.active) {
+        slackService.notifyUpdateOccurrence({
+          component: {
+            name: occurrence.value.Component.name,
+          },
+          incident: {
+            name: occurrence.value.Incident.name,
+          },
+          step: body,
+        })
+      }
 
       return dbOk(occurrenceStep, CREATED)
     } catch (error) {

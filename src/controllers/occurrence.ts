@@ -85,7 +85,9 @@ class OccurenceController
     id: number,
     body: OccurrenceBody
   ): Promise<DatabaseResult<Occurrence, Error>> => {
-    const occurence = await Occurrence.findByPk(id)
+    const occurence = await Occurrence.findByPk(id, {
+      include: [{ model: Component }, { model: Incident }],
+    })
 
     if (!occurence) return dbErr(new Error('Occurrence not found'), NOT_FOUND)
 
@@ -94,6 +96,15 @@ class OccurenceController
 
     try {
       await occurence.update(body)
+      if (!occurence.active)
+        slackService.notifyCloseOccurrence({
+          component: {
+            name: occurence.Component.name,
+          },
+          incident: {
+            name: occurence.Incident.name,
+          },
+        })
       return dbOk(occurence, OK)
     } catch (error) {
       return dbErr(error, INTERNAL_SERVER_ERROR)

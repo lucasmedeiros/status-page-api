@@ -7,6 +7,7 @@ class OccurrenceStep extends Model<OccurrenceStepAttrs> {
   public id!: number
   public description!: string
   public occurrenceId: number
+  public Occurrence: Occurrence
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
 }

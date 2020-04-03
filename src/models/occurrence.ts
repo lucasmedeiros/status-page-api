@@ -5,13 +5,13 @@ import Component from './component'
 import Incident from './incident'
 
 class Occurrence extends Model<OccurrenceAttrs> {
-  public Component: Component
-  public Incident: Incident
   public id!: number
   public active!: boolean
   public description!: string
   public componentId: number
   public incidentId: number
+  public Component: Component
+  public Incident: Incident
   public readonly createdAt!: Date
   public readonly updatedAt!: Date
 }
