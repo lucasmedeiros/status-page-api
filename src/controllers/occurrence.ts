@@ -74,6 +74,7 @@ class OccurenceController
         incident: {
           name: incident.value.name,
         },
+        description: body.description,
       })
       return dbOk(occurrence, CREATED)
     } catch (error) {

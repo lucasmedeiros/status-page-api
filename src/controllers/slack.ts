@@ -3,39 +3,54 @@ import { Context } from 'koa'
 import winston from 'winston'
 import slackService from '@services/slack.service'
 
-const start = (channel: string) => {
-  slackService.sendMessage({
-    text: 'Olá, como posso ajudá-lo?',
-    channel,
-    attachments: [
-      {
-        fallback: 'Algum erro aconteceu na seleção',
-        callback_id: 'start_option',
-        color: '#3AA3E3',
-        actions: [
-          {
-            name: 'startoption',
-            text: 'Ajuda',
-            type: 'button',
-            value: 'help',
-          },
-          {
-            name: 'startoption',
-            text: 'Criar um incidente',
-            style: 'danger',
-            type: 'button',
-            value: 'incident',
-            confirm: {
-              title: 'Deseja realmente criar um incidente?',
-              text: 'Isso irá notificar todo o canal #test-bot-lucas-medeiros',
-              ok_text: 'Sim, tenho certeza',
-              dismiss_text: 'Cancelar',
-            },
-          },
-        ],
-      },
-    ],
-  })
+import ComponentController from './component'
+import IncidentController from './incident'
+import OccurenceController from './occurrence'
+
+const handleCreateNewOccurrence = async ({
+  text,
+  channel,
+}: {
+  text: string
+  channel: string
+}) => {
+  const splitted = text.split(' ')
+  if (splitted.length !== 4) slackService.invalidCommand(channel)
+  else {
+    const componentController = new ComponentController()
+    const incidentController = new IncidentController()
+
+    componentController.getOne(+splitted[1]).then(component => {
+      if (component.isError)
+        slackService.invalidCommand(channel, component.error.message)
+      else {
+        incidentController.getOne(+splitted[2]).then(incident => {
+          if (incident.isError)
+            slackService.invalidCommand(channel, incident.error.message)
+          else {
+            const occurrenceController = new OccurenceController()
+            occurrenceController
+              .create({
+                active: true,
+                componentId: component.value.id,
+                incidentId: incident.value.id,
+                description: splitted[3],
+              })
+              .then(occurrence => {
+                if (occurrence.isError)
+                  slackService.invalidCommand(channel, occurrence.error.message)
+                else {
+                  slackService.sendMessage({
+                    text: 'Occurrence successfully created',
+                    channel,
+                  })
+                }
+              })
+          }
+        })
+      }
+    })
+  }
 }
 
 export default {
@@ -57,7 +72,11 @@ export default {
         if (type === 'message') {
           try {
             if (text === 'start') {
-              start(channel)
+              slackService.showMenu(channel)
+            }
+
+            if (text.startsWith('new')) {
+              handleCreateNewOccurrence({ text, channel })
             }
           } catch (error) {
             winston.log(
@@ -76,17 +95,20 @@ export default {
   },
 
   actions: async (ctx: Context) => {
-    // const { payload } = ctx.request.body
+    let body
 
-    // const action = JSON.parse(payload)
+    const { payload } = ctx.request.body
 
-    // if (
-    //   action.type === 'interactive_message' &&
-    //   action.callback_id === 'start_option'
-    // ) {
+    const action = JSON.parse(payload)
 
-    // }
+    if (
+      action.type === 'interactive_message' &&
+      action.callback_id === 'start_option'
+    ) {
+      body = await slackService.handleStartAction(action.actions[0])
+    }
 
     ctx.status = OK
+    ctx.body = body ?? ''
   },
 }

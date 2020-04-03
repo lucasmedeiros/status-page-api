@@ -4,7 +4,11 @@ import {
   WebClient,
   WebAPICallResult,
   ChatPostMessageArguments,
+  PlainTextElement,
+  MrkdwnElement,
 } from '@slack/web-api'
+import ComponentController from '@controllers/component'
+import IncidentController from '@controllers/incident'
 
 import config from '../config'
 
@@ -18,9 +22,8 @@ interface ChatPostMessageResult extends WebAPICallResult {
   }
 }
 
-const callWebhook = (
-  messageArguments: Omit<ChatPostMessageArguments, 'channel'>
-) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const callWebhook = (messageArguments: any) => {
   fetch(config.slack.webhookUrl as string, {
     body: JSON.stringify(messageArguments),
     method: 'POST',
@@ -31,7 +34,7 @@ const callWebhook = (
 }
 
 export default {
-  sendMessage: async (messageArguments: ChatPostMessageArguments) => {
+  async sendMessage(messageArguments: ChatPostMessageArguments) {
     const res = (await web.chat.postMessage(
       messageArguments
     )) as ChatPostMessageResult
@@ -42,13 +45,78 @@ export default {
     )
   },
 
-  notifyNewOccurrence: async ({
+  showMenu(channel: string) {
+    this.sendMessage({
+      text: 'Hello, how may I help you?',
+      channel,
+      attachments: [
+        {
+          fallback: 'Some error occurred on selecting...',
+          callback_id: 'start_option',
+          color: '#3AA3E3',
+          actions: [
+            {
+              name: 'startoption',
+              text: 'Create occurrence',
+              type: 'button',
+              value: 'incident',
+            },
+            {
+              name: 'startoption',
+              text: 'Update occurrence',
+              type: 'button',
+              value: 'update',
+            },
+            {
+              name: 'startoption',
+              text: 'Help',
+              type: 'button',
+              value: 'help',
+            },
+          ],
+        },
+      ],
+    })
+  },
+
+  invalidCommand(channel: string, text = 'Invalid command, please try again.') {
+    this.sendMessage({
+      text: ` :no_entry: *ERROR* :no_entry: `,
+      channel,
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: ` :no_entry: *ERROR* :no_entry: `,
+          },
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text,
+          },
+        },
+      ],
+    })
+  },
+
+  help() {},
+
+  async notifyNewOccurrence({
     component,
     incident,
+    description,
   }: {
     component: ComponentBody
     incident: IncidentBody
-  }) => {
+    description: string
+  }) {
+    const date = new Date()
     callWebhook({
       text: 'NEW OCCURRENCE :warning:',
       blocks: [
@@ -56,27 +124,58 @@ export default {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: 'NEW OCCURRENCE :warning:',
+            text: ':warning:  *NEW OCCURRENCE*  :warning:',
+          },
+        },
+        {
+          type: 'context',
+          elements: [
+            {
+              text: `*${date.toLocaleString()}* `,
+              type: 'mrkdwn',
+            },
+          ],
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'context',
+          elements: [
+            {
+              text: `*Component*: ${component.name}\n*Incident*: ${incident.name} `,
+              type: 'mrkdwn',
+            },
+          ],
+        },
+        {
+          type: 'divider',
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: ` :computer: *${component.name}* :computer:`,
           },
         },
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*${component.name}* is under *${incident.name}*!`,
+            text: description,
           },
         },
       ],
     })
   },
 
-  notifyCloseOccurrence: async ({
+  async notifyCloseOccurrence({
     component,
     incident,
   }: {
     component: ComponentBody
     incident: IncidentBody
-  }) => {
+  }) {
     callWebhook({
       text: 'OCCURRENCE CLOSED :heavy_check_mark:',
       blocks: [
@@ -84,7 +183,7 @@ export default {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: 'OCCURRENCE CLOSED :heavy_check_mark:',
+            text: ':heavy_check_mark:  *OCCURRENCE CLOSED*  :heavy_check_mark:',
           },
         },
         {
@@ -98,7 +197,7 @@ export default {
     })
   },
 
-  notifyUpdateOccurrence: async ({
+  async notifyUpdateOccurrence({
     component,
     incident,
     step,
@@ -106,7 +205,7 @@ export default {
     component: ComponentBody
     incident: IncidentBody
     step: OccurrenceStepBody
-  }) => {
+  }) {
     callWebhook({
       text: 'OCCURRENCE UPDATED :construction_worker:',
       blocks: [
@@ -114,24 +213,57 @@ export default {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: 'OCCURRENCE UPDATED :construction_worker:',
+            text:
+              ':construction_worker:  *OCCURRENCE UPDATED*  :construction_worker:',
           },
         },
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `*${incident.name}* on *${component.name}* had an update!`,
+            text: `*Component*: ${component.name}\n*Incident*: ${incident.name} \nThis incident had an update!`,
           },
         },
         {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: `${step.description}`,
+            text: `*UPDATE*: ${step.description}`,
           },
         },
       ],
     })
+  },
+
+  async handleStartAction(action: { value: 'update' | 'incident' | 'help' }) {
+    let body = {}
+    if (action.value === 'update') {
+      body = {
+        text: 'Mensagem de teste',
+      }
+    }
+
+    if (action.value === 'incident') {
+      body = {
+        text:
+          'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`',
+      }
+    }
+
+    if (action.value === 'update') {
+      body = {
+        text:
+          'To update an existing occurrence, you should enter `update [occurrence_id] [description]`',
+      }
+    }
+
+    if (action.value === 'help') {
+      body = {
+        text:
+          'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`\nTo update an existing occurrence, you should enter `update [occurrence_id] [description]`',
+      }
+    }
+
+    return body
   },
 }
