@@ -25,6 +25,7 @@ const config = {
     signinSecret: process.env.SLACK_APP_SIGNIN_SECRET,
     clientId: process.env.SLACK_APP_CLIENT_ID,
     verificationToken: process.env.SLACK_APP_VERIFICATION_TOKEN,
+    webhookUrl: process.env.SLACK_WEBHOOK_URL,
   },
 }
 

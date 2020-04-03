@@ -1,5 +1,10 @@
-import { WebClient, WebAPICallResult } from '@slack/web-api'
 import winston from 'winston'
+import fetch from 'node-fetch'
+import {
+  WebClient,
+  WebAPICallResult,
+  ChatPostMessageArguments,
+} from '@slack/web-api'
 
 import config from '../config'
 
@@ -13,16 +18,83 @@ interface ChatPostMessageResult extends WebAPICallResult {
   }
 }
 
+const callWebhook = (
+  messageArguments: Omit<ChatPostMessageArguments, 'channel'>
+) => {
+  fetch(config.slack.webhookUrl as string, {
+    body: JSON.stringify(messageArguments),
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+    },
+  })
+}
+
 export default {
-  sendMessage: async (text: string, channel: string) => {
-    const res = (await web.chat.postMessage({
-      text,
-      channel,
-    })) as ChatPostMessageResult
+  sendMessage: async (messageArguments: ChatPostMessageArguments) => {
+    const res = (await web.chat.postMessage(
+      messageArguments
+    )) as ChatPostMessageResult
 
     winston.log(
       'info',
       `A message was post to conversation ${res.channel} with id ${res.ts} wich contains the message ${res.message}`
     )
+  },
+
+  notifyNewOccurrence: async ({
+    component,
+    incident,
+  }: {
+    component: ComponentBody
+    incident: IncidentBody
+  }) => {
+    callWebhook({
+      text: 'NEW OCCURRENCE :warning:',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'NEW OCCURRENCE :warning:',
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `${component.name} is under ${incident.name}!`,
+          },
+        },
+      ],
+    })
+  },
+
+  notifyCloseOccurrence: async ({
+    component,
+    incident,
+  }: {
+    component: ComponentBody
+    incident: IncidentBody
+  }) => {
+    callWebhook({
+      text: 'OCCURRENCE CLOSED :heavy_check_mark:',
+      blocks: [
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: 'OCCURRENCE CLOSED :heavy_check_mark:',
+          },
+        },
+        {
+          type: 'section',
+          text: {
+            type: 'mrkdwn',
+            text: `${component.name} is no longer under ${incident.name}!`,
+          },
+        },
+      ],
+    })
   },
 }

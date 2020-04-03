@@ -9,6 +9,7 @@ import Occurrence from '@models/occurrence'
 import { dbErr, dbOk } from '@utils/handler'
 import Component from '@models/component'
 import Incident from '@models/incident'
+import slackService from '@services/slack.service'
 
 import ComponentController from './component'
 import IncidentController from './incident'
@@ -66,6 +67,14 @@ class OccurenceController
 
     try {
       const occurrence = await Occurrence.create(body)
+      slackService.notifyNewOccurrence({
+        component: {
+          name: component.value.name,
+        },
+        incident: {
+          name: incident.value.name,
+        },
+      })
       return dbOk(occurrence, CREATED)
     } catch (error) {
       return dbErr(error, INTERNAL_SERVER_ERROR)
@@ -94,10 +103,21 @@ class OccurenceController
   public del = async (
     id: number
   ): Promise<DatabaseResult<Occurrence, Error>> => {
-    const occurence = await Occurrence.findByPk(id)
+    const occurence = await Occurrence.findByPk(id, {
+      include: [{ model: Component }, { model: Incident }],
+    })
     if (!occurence) return dbErr(new Error('Occurrence not found'), NOT_FOUND)
 
     await occurence.destroy()
+
+    slackService.notifyCloseOccurrence({
+      component: {
+        name: occurence.Component.name,
+      },
+      incident: {
+        name: occurence.Incident.name,
+      },
+    })
     return dbOk(occurence, OK)
   }
 }
