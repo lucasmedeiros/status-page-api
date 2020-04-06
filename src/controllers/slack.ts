@@ -15,7 +15,7 @@ const handleCreateNewOccurrence = async ({
   channel: string
 }) => {
   const splitted = text.split(' ')
-  if (splitted.length !== 4) slackService.invalidCommand(channel)
+  if (splitted.length < 4) slackService.invalidCommand(channel)
   else {
     const componentController = new ComponentController()
     const incidentController = new IncidentController()
@@ -34,7 +34,9 @@ const handleCreateNewOccurrence = async ({
                 active: true,
                 componentId: component.value.id,
                 incidentId: incident.value.id,
-                description: splitted[3],
+                description: splitted
+                  .map((object, index) => (index > 2 ? object : null))
+                  .join(' '),
               })
               .then(occurrence => {
                 if (occurrence.isError)

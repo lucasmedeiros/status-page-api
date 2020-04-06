@@ -95,9 +95,11 @@ class OccurenceController
     if (body.active === null || body.active === undefined)
       body.active = occurence.active
 
+    const prevOccurrence = occurence.active
+
     try {
       await occurence.update(body)
-      if (!occurence.active)
+      if (!occurence.active && prevOccurrence) {
         slackService.notifyCloseOccurrence({
           component: {
             name: occurence.Component.name,
@@ -106,6 +108,7 @@ class OccurenceController
             name: occurence.Incident.name,
           },
         })
+      }
       return dbOk(occurence, OK)
     } catch (error) {
       return dbErr(error, INTERNAL_SERVER_ERROR)

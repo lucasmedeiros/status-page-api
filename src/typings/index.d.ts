@@ -73,6 +73,7 @@ type DatabaseResult<R, E> =
     }
 
 interface Controller<M, B, E> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   get(ctx?: any): Promise<M[]>
   getOne(id: number): Promise<DatabaseResult<M, E>>
   create(body: B): Promise<DatabaseResult<M, E>>

@@ -4,11 +4,7 @@ import {
   WebClient,
   WebAPICallResult,
   ChatPostMessageArguments,
-  PlainTextElement,
-  MrkdwnElement,
 } from '@slack/web-api'
-import ComponentController from '@controllers/component'
-import IncidentController from '@controllers/incident'
 
 import config from '../config'
 
@@ -33,8 +29,29 @@ const callWebhook = (messageArguments: any) => {
   })
 }
 
-export default {
-  async sendMessage(messageArguments: ChatPostMessageArguments) {
+class SlackService {
+  private _getCreateOccurrenceInfoText(): { text: string } {
+    return {
+      text:
+        'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`',
+    }
+  }
+
+  private _getUpdateInfoText(): { text: string } {
+    return {
+      text:
+        'To update an existing occurrence, you should enter `update [occurrence_id] [description]`',
+    }
+  }
+
+  private _getHelpInfoText(): { text: string } {
+    return {
+      text:
+        'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`\nTo update an existing occurrence, you should enter `update [occurrence_id] [description]`',
+    }
+  }
+
+  public async sendMessage(messageArguments: ChatPostMessageArguments) {
     const res = (await web.chat.postMessage(
       messageArguments
     )) as ChatPostMessageResult
@@ -43,9 +60,9 @@ export default {
       'info',
       `A message was post to conversation ${res.channel} with id ${res.ts} wich contains the message ${res.message}`
     )
-  },
+  }
 
-  showMenu(channel: string) {
+  public showMenu(channel: string) {
     this.sendMessage({
       text: 'Hello, how may I help you?',
       channel,
@@ -77,9 +94,12 @@ export default {
         },
       ],
     })
-  },
+  }
 
-  invalidCommand(channel: string, text = 'Invalid command, please try again.') {
+  public invalidCommand(
+    channel: string,
+    text = 'Invalid command, please try again.'
+  ) {
     this.sendMessage({
       text: ` :no_entry: *ERROR* :no_entry: `,
       channel,
@@ -103,11 +123,9 @@ export default {
         },
       ],
     })
-  },
+  }
 
-  help() {},
-
-  async notifyNewOccurrence({
+  public async notifyNewOccurrence({
     component,
     incident,
     description,
@@ -167,9 +185,9 @@ export default {
         },
       ],
     })
-  },
+  }
 
-  async notifyCloseOccurrence({
+  public async notifyCloseOccurrence({
     component,
     incident,
   }: {
@@ -195,9 +213,9 @@ export default {
         },
       ],
     })
-  },
+  }
 
-  async notifyUpdateOccurrence({
+  public async notifyUpdateOccurrence({
     component,
     incident,
     step,
@@ -233,37 +251,28 @@ export default {
         },
       ],
     })
-  },
+  }
 
-  async handleStartAction(action: { value: 'update' | 'incident' | 'help' }) {
+  public async handleStartAction(action: {
+    value: 'update' | 'incident' | 'help'
+  }) {
     let body = {}
-    if (action.value === 'update') {
-      body = {
-        text: 'Mensagem de teste',
-      }
-    }
-
     if (action.value === 'incident') {
-      body = {
-        text:
-          'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`',
-      }
+      body = this._getCreateOccurrenceInfoText()
     }
 
     if (action.value === 'update') {
-      body = {
-        text:
-          'To update an existing occurrence, you should enter `update [occurrence_id] [description]`',
-      }
+      body = this._getUpdateInfoText()
     }
 
     if (action.value === 'help') {
-      body = {
-        text:
-          'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`\nTo update an existing occurrence, you should enter `update [occurrence_id] [description]`',
-      }
+      body = this._getHelpInfoText()
     }
 
     return body
-  },
+  }
 }
+
+const service = new SlackService()
+
+export default service
