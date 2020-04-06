@@ -24,6 +24,16 @@ class OccurenceController
     return occurences
   }
 
+  public getByActive = async (active = true): Promise<Occurrence[]> => {
+    const occurrences = await Occurrence.findAll({
+      where: {
+        active,
+      },
+    })
+
+    return occurrences
+  }
+
   public getOne = async (
     id: number
   ): Promise<DatabaseResult<Occurrence, Error>> => {
