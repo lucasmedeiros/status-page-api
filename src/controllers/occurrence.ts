@@ -29,6 +29,7 @@ class OccurenceController
       where: {
         active,
       },
+      include: [{ model: Component }, { model: Incident }],
     })
 
     return occurrences

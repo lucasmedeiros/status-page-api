@@ -8,17 +8,9 @@ export default {
   get: async (ctx: Context) => {
     const occurrences = await occurrenceController.getByActive()
 
-    let status: string
-
-    if (occurrences.length) {
-      status = 'UNHEALTHY'
-    } else {
-      status = 'HEALTHY'
-    }
-
     ctx.status = OK
     ctx.body = {
-      status,
+      healty: occurrences.length === 0,
       occurrences,
     }
   },

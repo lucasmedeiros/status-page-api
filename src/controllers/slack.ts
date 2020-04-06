@@ -55,6 +55,33 @@ const handleCreateNewOccurrence = async ({
   }
 }
 
+const handleCloseOccurrence = async ({
+  text,
+  channel,
+}: {
+  text: string
+  channel: string
+}) => {
+  const splitted = text.split(' ')
+  if (splitted.length !== 2) slackService.invalidCommand(channel)
+  else {
+    const occurrenceController = new OccurenceController()
+
+    occurrenceController
+      .update(+splitted[1], { active: false })
+      .then(occurrence => {
+        if (occurrence.isError)
+          slackService.invalidCommand(channel, occurrence.error.message)
+        else {
+          slackService.sendMessage({
+            text: 'Occurrence successfully closed',
+            channel,
+          })
+        }
+      })
+  }
+}
+
 export default {
   botEvent: async (ctx: Context) => {
     const { challenge } = ctx.request.body
@@ -79,6 +106,8 @@ export default {
 
             if (text.startsWith('new')) {
               handleCreateNewOccurrence({ text, channel })
+            } else if (text.startsWith('close')) {
+              handleCloseOccurrence({ text, channel })
             }
           } catch (error) {
             winston.log(

@@ -37,17 +37,17 @@ class SlackService {
     }
   }
 
-  private _getUpdateInfoText(): { text: string } {
+  private _getCloseInfoText(): { text: string } {
     return {
       text:
-        'To update an existing occurrence, you should enter `update [occurrence_id] [description]`',
+        'To close an existing occurrence, you should enter `close [occurrence_id]`',
     }
   }
 
   private _getHelpInfoText(): { text: string } {
     return {
       text:
-        'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`\nTo update an existing occurrence, you should enter `update [occurrence_id] [description]`',
+        'To create a new occurrence, you should enter `new [component_id] [incident_id] [description]`\nTo close an existing occurrence, you should enter `close [occurrence_id]`',
     }
   }
 
@@ -80,9 +80,9 @@ class SlackService {
             },
             {
               name: 'startoption',
-              text: 'Update occurrence',
+              text: 'Close occurrence',
               type: 'button',
-              value: 'update',
+              value: 'close',
             },
             {
               name: 'startoption',
@@ -254,15 +254,15 @@ class SlackService {
   }
 
   public async handleStartAction(action: {
-    value: 'update' | 'incident' | 'help'
+    value: 'close' | 'incident' | 'help'
   }) {
     let body = {}
     if (action.value === 'incident') {
       body = this._getCreateOccurrenceInfoText()
     }
 
-    if (action.value === 'update') {
-      body = this._getUpdateInfoText()
+    if (action.value === 'close') {
+      body = this._getCloseInfoText()
     }
 
     if (action.value === 'help') {
